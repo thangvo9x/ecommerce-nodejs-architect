@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose');
 
-const connectString = 'mongodb://127.0.0.1:27017/shopDEV';
+const connectString = 'mongodb://127.0.0.1:27017/shopDev';
 mongoose
   .connect(connectString)
   .then((_) => console.log('connected mongodb success!'))
