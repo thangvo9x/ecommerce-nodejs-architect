@@ -9,3 +9,13 @@ x-api-key: c5cdfcec84c346de98e55b8ff654a936483ffcac74bb43e77d63914f31478961677d1
  "email": "tonyvo9x_04@hotmail.com",
  "password": "123456"
 }
+
+### login
+POST {{url_dev}}/shop/login
+Content-Type: application/json
+x-api-key: 4268b3519dc5383dbd07cda8125165146a3b54e542eefe6d86dd5e7f5828a9fb685b1c66311b9b3c981d5947926d987625e478cf3be85e387587e0971a05e8a5
+
+{
+ "email": "tonyvo9x_04@hotmail.com",
+ "password": "123456"
+}

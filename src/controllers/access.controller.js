@@ -4,9 +4,15 @@ const shopModel = require('../models/shop.model');
 const AccessService = require('../services/access.service');
 
 const { ConflictRequestError } = require('../core/error.response');
-const { CreatedSuccess } = require('../core/success.response');
+const { CreatedSuccess, SuccessResponse} = require('../core/success.response');
 
 class AccessController {
+  login = async (req, res) => {
+    new SuccessResponse({
+      metadata: await AccessService.login(req.body)
+    }).send(res);
+  };
+
   signUp = async (req, res) => {
     console.log('[P]::signUp::', req.body);
     const shopExisted = await shopModel

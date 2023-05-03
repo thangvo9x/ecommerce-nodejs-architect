@@ -51,4 +51,5 @@ class CreatedSuccess extends SuccessResponse {
 module.exports = {
   OkSuccess,
   CreatedSuccess,
+  SuccessResponse
 };
