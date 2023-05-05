@@ -26,58 +26,43 @@ class AccessService {
   refreshToken
   */
 
-  static handleRefreshToken = async (refreshToken) => {
-    // check xem token was be used ???
-    const foundRefreshToken = await keyTokenService.findByRefreshTokenUsed(
-      refreshToken
-    );
-    if (foundRefreshToken) {
-      // decode
-      const { userId, email } = await verifyJWT(
-        refreshToken,
-        foundRefreshToken.publicKey
-      );
-      console.log({ userId, email });
+  static handleRefreshToken = async ({ refreshToken, user, keyStore }) => {
+    const { userId, email } = user;
 
+    // check xem token was be used ???
+    if (keyStore.refreshTokensUsed.includes(refreshToken)) {
       // remove
       await keyTokenService.deleteKeyById(userId);
       throw new ForbiddenError('Something went wrong! Plz login again');
     }
 
     // NO.
-    const holderRefreshToken = await keyTokenService.findByRefreshToken(
-      refreshToken
-    );
-    if (!holderRefreshToken) throw new AuthFailError('Shop is not registered');
-    console.log('holderRefreshToken', holderRefreshToken);
-    // verifyToken
-    const { userId, email } = await verifyJWT(
-      holderRefreshToken,
-      holderRefreshToken.publicKey
-    );
-    // check userId
+    if (keyStore.refreshToken !== refreshToken) {
+      throw new AuthFailError('Shop is not registered');
+    }
+
     const foundShop = await shopService.findByEmail({ email });
     if (!foundShop) throw new AuthFailError('Shop is not registered');
 
     // create new pairToken
     const tokens = await createTokenPair({
       payload: { userId, email },
-      publicKey: holderRefreshToken.publicKey,
-      privateKey: holderRefreshToken.privateKey,
+      publicKey: keyStore.publicKey,
+      privateKey: keyStore.privateKey,
     });
 
     // update refreshToken
-    await holderRefreshToken.updateOne({
+    await keyStore.updateOne({
       $set: {
         refreshToken: tokens.refreshToken,
-        $addToSet: {
-          refreshTokensUsed: refreshToken,
-        },
+      },
+      $addToSet: {
+        refreshTokensUsed: refreshToken,
       },
     });
-    
+
     return {
-      user: { userId, email },
+      user,
       tokens,
     };
   };
