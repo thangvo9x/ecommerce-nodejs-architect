@@ -25,7 +25,7 @@ const createTokenPair = async ({ payload, publicKey, privateKey }) => {
       expiresIn: '7 days',
     });
 
-    // use SECRET_KEY is WRONG. => leak ^__^
+    // Note: use SECRET_KEY is WRONG. => leak ^__^
 
     JWT.verify(accessToken, publicKey, (err, decode) => {
       if (err) {
