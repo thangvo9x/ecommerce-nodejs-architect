@@ -8,8 +8,22 @@ const {
 } = require('../product.model');
 const { Types } = require('mongoose');
 
+const searchProductByUser = async ({ keySearch }) => {
+  const regexSearch = new RegExp(keySearch);
+  const results = await product
+    .find(
+      {
+        $text: { $search: regexSearch },
+      },
+      { score: { $meta: 'textScore' } }
+    )
+    .sort({ score: { $meta: 'textScore' } })
+    .lean();
+  return results;
+};
+
 const findAllDraftStatusForShop = async ({ query, limit, skip }) => {
-  return queryProduct({ query, limit, skip });
+  return await queryProduct({ query, limit, skip });
 };
 
 const publishProductByShop = async ({ product_shop, product_id }) => {
@@ -21,13 +35,25 @@ const publishProductByShop = async ({ product_shop, product_id }) => {
 
   foundShop.isDraft = false;
   foundShop.isPublished = true;
-  console.log(foundShop)
   const { modifiedCount } = await foundShop.updateOne(foundShop);
   return modifiedCount;
 };
 
+const unPublishProductByShop = async ({ product_shop, product_id }) => {
+  const foundShop = await product.findOne({
+    product_shop: new Types.ObjectId(product_shop),
+    _id: new Types.ObjectId(product_id),
+  });
+  if (!foundShop) return null;
+
+  foundShop.isDraft = true;
+  foundShop.isPublished = false;
+  const { modifiedCount } = await foundShop.update(foundShop);
+  return modifiedCount;
+};
+
 const findAllPublishedStatusForShop = async ({ query, limit, skip }) => {
-  return queryProduct({ query, limit, skip });
+  return await queryProduct({ query, limit, skip });
 };
 
 const queryProduct = async ({ query, limit, skip }) => {
@@ -44,5 +70,7 @@ const queryProduct = async ({ query, limit, skip }) => {
 module.exports = {
   findAllDraftStatusForShop,
   publishProductByShop,
+  unPublishProductByShop,
   findAllPublishedStatusForShop,
+  searchProductByUser,
 };

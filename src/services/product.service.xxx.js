@@ -11,6 +11,8 @@ const {
   findAllDraftStatusForShop,
   findAllPublishedStatusForShop,
   publishProductByShop,
+  unPublishProductByShop,
+  searchProductByUser,
 } = require('../models/repositories/product.repo');
 
 class ProductFactory {
@@ -41,6 +43,10 @@ class ProductFactory {
     return await publishProductByShop({ product_shop, product_id });
   }
 
+  static async unPublishProductByShop({ product_shop, product_id }) {
+    return await unPublishProductByShop({ product_shop, product_id });
+  }
+
   static async findAllPublishedStatusForShop({
     product_shop,
     limit = 50,
@@ -48,6 +54,10 @@ class ProductFactory {
   }) {
     const query = { product_shop, isPublished: true };
     return await findAllPublishedStatusForShop({ query, limit, skip });
+  }
+
+  static async searchProducts({ keySearch }) {
+    return await searchProductByUser({ keySearch });
   }
 }
 
