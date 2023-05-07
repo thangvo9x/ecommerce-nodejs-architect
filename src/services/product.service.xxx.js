@@ -9,6 +9,8 @@ const {
 const { BadRequestError } = require('../core/error.response');
 const {
   findAllDraftStatusForShop,
+  findAllPublishedStatusForShop,
+  publishProductByShop,
 } = require('../models/repositories/product.repo');
 
 class ProductFactory {
@@ -33,6 +35,19 @@ class ProductFactory {
   }) {
     const query = { product_shop, isDraft: true };
     return await findAllDraftStatusForShop({ query, limit, skip });
+  }
+
+  static async publishProductByShop({ product_shop, product_id }) {
+    return await publishProductByShop({ product_shop, product_id });
+  }
+
+  static async findAllPublishedStatusForShop({
+    product_shop,
+    limit = 50,
+    skip = 0,
+  }) {
+    const query = { product_shop, isPublished: true };
+    return await findAllPublishedStatusForShop({ query, limit, skip });
   }
 }
 
