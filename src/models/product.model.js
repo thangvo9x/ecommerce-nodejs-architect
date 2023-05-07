@@ -1,11 +1,11 @@
 'use strict';
 
-const { Schema, model } = require('mongoose'); // Erase if already required
+const { Schema, model, Types } = require('mongoose'); // Erase if already required
 
 const DOCUMENT_NAME = 'Product';
 const COLLECTION_NAME = 'Products';
 // Declare the Schema of the Mongo model
-var productSchema = new mongoose.Schema(
+var productSchema = new Schema(
   {
     product_name: {
       type: String,
@@ -32,8 +32,8 @@ var productSchema = new mongoose.Schema(
       enum: ['Electronics', 'Clothing', 'Furniture'],
     },
     product_shop: {
-      type: new Schema.Types.ObjectId,
-      ref: 'Shop'
+      type: Schema.Types.ObjectId,
+      ref: 'Shop',
     },
     product_attributes: {
       type: Schema.Types.Mixed,
@@ -47,11 +47,15 @@ var productSchema = new mongoose.Schema(
 );
 
 // define product type = clothing
-const clothingSchema = Schema(
+const clothingSchema = new Schema(
   {
     brand: { type: String, required: true },
     size: String,
     material: String,
+    product_shop: {
+      type: Schema.Types.ObjectId,
+      ref: 'Shop',
+    },
   },
   {
     collection: 'clothes',
@@ -60,11 +64,12 @@ const clothingSchema = Schema(
 );
 
 // define product type = electronic
-const electronicSchema = Schema(
+const electronicSchema = new Schema(
   {
     manufacturer: { type: String, required: true },
     model: String,
     color: String,
+    product_shop: { type: Schema.Types.ObjectId, ref: 'Shop' },
   },
   {
     collection: 'electronics',
@@ -76,5 +81,5 @@ const electronicSchema = Schema(
 module.exports = {
   product: model(DOCUMENT_NAME, productSchema),
   clothing: model('Clothing', clothingSchema),
-  electronics: model('Electronics', electronicSchema),
+  electronic: model('Electronics', electronicSchema),
 };
