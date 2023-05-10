@@ -64,7 +64,7 @@ var productSchema = new Schema(
   }
 );
 
-// create index for search
+// create index for full text search
 productSchema.index({ product_name: 'text', product_description: 'text' });
 
 // Document middleware: runs before.save() and .create()...

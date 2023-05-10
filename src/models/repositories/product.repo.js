@@ -1,5 +1,6 @@
 'use strict';
 
+const { getSelectData, unGetSelectData } = require('../../utils');
 const {
   product,
   electronic,
@@ -56,6 +57,36 @@ const findAllPublishedStatusForShop = async ({ query, limit, skip }) => {
   return await queryProduct({ query, limit, skip });
 };
 
+const findAllProducts = async ({ limit, sort, page, filter, select }) => {
+  const skip = (page - 1) * limit;
+  const sortBy = sort === 'ctime' ? { _id: -1 } : { _id: 1 };
+  const products = await product
+    .find(filter)
+    .sort(sortBy)
+    .skip(skip)
+    .limit(limit)
+    .select(getSelectData(select))
+    .lean();
+  return products;
+};
+
+const findProduct = async ({ product_id, unSelect }) => {
+  // because we need many fields in detail
+  const products = await product
+    .findById(product_id)
+    .select(unGetSelectData(unSelect));
+  return products;
+};
+
+const updateProductById = async ({
+  productId,
+  payload,
+  model,
+  isNew = true,
+}) => {
+  return await model.findByIdAndUpdate(productId, payload, { new: isNew });
+};
+
 const queryProduct = async ({ query, limit, skip }) => {
   return await product
     .find(query)
@@ -73,4 +104,7 @@ module.exports = {
   unPublishProductByShop,
   findAllPublishedStatusForShop,
   searchProductByUser,
+  findAllProducts,
+  findProduct,
+  updateProductById,
 };
