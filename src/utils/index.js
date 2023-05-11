@@ -1,21 +1,21 @@
 const _ = require('lodash');
-
-const getInfoData = ({ fields = [], source = {} }) => {
+const {Types} = require('mongoose');
+const getInfoData = ({fields = [], source = {}}) => {
   return _.pick(source, fields);
 };
 
 // ['a', b] = {a: 1, b: 1}
 const getSelectData = (select = []) => {
-  return Object.fromEntries(select.map((el) => [el, 1]));
+  return Object.fromEntries(select.map(el => [el, 1]));
 };
 
 // ['a', b] = {a: 0, b: 0}
 const unGetSelectData = (select = []) => {
-  return Object.fromEntries(select.map((el) => [el, 0]));
+  return Object.fromEntries(select.map(el => [el, 0]));
 };
 
-const removeUndefinedObject = (obj) => {
-  Object.keys(obj).forEach((k) => {
+const removeUndefinedObject = obj => {
+  Object.keys(obj).forEach(k => {
     if (obj[k] == null) {
       delete obj[k];
     }
@@ -23,22 +23,24 @@ const removeUndefinedObject = (obj) => {
   return obj;
 };
 
-const updateNestedObjectParser = (obj) => {
+const updateNestedObjectParser = obj => {
   const final = {};
-  console.log("before", obj);
-  Object.keys(obj).forEach((k) => {
+  console.log('before', obj);
+  Object.keys(obj).forEach(k => {
     if (typeof obj[k] === 'object' && !Array.isArray(obj[k])) {
       const response = updateNestedObjectParser(obj[k]);
-      Object.keys(response).forEach((a) => {
+      Object.keys(response).forEach(a => {
         final[`${k}.${a}`] = response[a];
       });
     } else {
       final[k] = obj[k];
     }
   });
-  console.log("after", final);
+  console.log('after', final);
   return final;
 };
+
+const convertToObjectId = id => new Types.ObjectId(id);
 
 module.exports = {
   getInfoData,
@@ -46,4 +48,5 @@ module.exports = {
   unGetSelectData,
   removeUndefinedObject,
   updateNestedObjectParser,
+  convertToObjectId,
 };
