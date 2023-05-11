@@ -1,12 +1,11 @@
 'use strict';
-
+const { BadRequestError } = require('../core/error.response');
 const {
   product,
   clothing,
   electronic,
   furniture,
 } = require('../models/product.model');
-const { BadRequestError } = require('../core/error.response');
 const {
   findAllDraftStatusForShop,
   findAllPublishedStatusForShop,
@@ -17,6 +16,7 @@ const {
   findProduct,
   updateProductById,
 } = require('../models/repositories/product.repo');
+const { insertInventory } = require('../models/repositories/inventory.repo');
 
 const { updateNestedObjectParser, removeUndefinedObject } = require('../utils');
 
@@ -131,7 +131,16 @@ class Product {
   }
 
   async createProduct(product_id) {
-    return await product.create({ ...this, _id: product_id });
+    const newProduct = await product.create({ ...this, _id: product_id });
+    if (newProduct) {
+      // add product_stock
+      await insertInventory({
+        productId: newProduct._id,
+        shopId: newProduct.product_shop,
+        stock: newProduct.product_quantity,
+      });
+    }
+    return newProduct;
   }
 
   async updateProduct(productId, payload) {
@@ -226,7 +235,10 @@ class Furniture extends Product {
       });
     }
 
-    const updateProduct = await super.updateProduct(productId, updateNestedObjectParser(objParams));
+    const updateProduct = await super.updateProduct(
+      productId,
+      updateNestedObjectParser(objParams)
+    );
     return updateProduct;
   }
 }
