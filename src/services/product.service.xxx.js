@@ -84,22 +84,12 @@ class ProductFactory {
       page,
       sort,
       filter,
-      select: ['product_name', 'product_thumb', 'product_price'],
-    });
-  }
-
-  static async findProduct({
-    limit = 50,
-    page = 1,
-    sort = 'ctime',
-    filter = { isPublished: true },
-  }) {
-    return await findAllProducts({
-      limit,
-      page,
-      sort,
-      filter,
-      select: ['product_name', 'product_thumb', 'product_price'],
+      select: [
+        'product_name',
+        'product_thumb',
+        'product_price',
+        'product_shop',
+      ],
     });
   }
 
@@ -237,7 +227,7 @@ class Furniture extends Product {
 
     const updateProduct = await super.updateProduct(
       productId,
-      updateNestedObjectParser(objParams)
+      updateNestedObjectParser(objParams),
     );
     return updateProduct;
   }
