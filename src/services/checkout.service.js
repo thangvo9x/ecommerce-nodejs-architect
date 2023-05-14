@@ -2,12 +2,14 @@
 
 const { BadRequestError, NotFoundError } = require('../core/error.response');
 const { findCartById } = require('../models/repositories/cart.repo');
-
+const { order } = require('../models/order.model');
 const {
   checkProductAvailable,
 } = require('../models/repositories/product.repo');
 const { formatCurrency } = require('../utils');
 const { getDiscountAmount } = require('./discount.service');
+const { aquireLock, releaseLock } = require('./redis.service');
+const { addStockToInventory } = require('./inventory.service');
 /*
 
     Key feature: CheckoutService Service
@@ -119,6 +121,81 @@ class CheckoutService {
       },
     };
   }
+
+  // order
+  static async order({
+    shop_order_ids,
+    cartId,
+    userId,
+    user_address = {},
+    user_payment = {},
+  }) {
+    // double check for checkout again
+    const { shop_order_ids_new, checkout_order } = await this.checkoutReview({
+      cartId,
+      userId,
+      shop_order_ids,
+    });
+    const products = shop_order_ids_new.flatMap(order => order.item_products);
+    console.log(`[1]:::`, products);
+    const acquireProduct = [];
+    for (let i = 0; i < products.length; i++) {
+      const { quantity, productId } = products[i];
+      const keyLock = await aquireLock(productId, quantity, cartId);
+      acquireProduct.push(keyLock ? true : false);
+      if (keyLock) {
+        await releaseLock(keyLock);
+      }
+    }
+
+    // check if have any product out of stock in inventory
+    if (acquireProduct.includes(false)) {
+      throw new BadRequestError(
+        'Some product has been updated, Come back cart and try again, please!',
+      );
+    }
+
+    const newOrder = await order.create({
+      order_userId: userId,
+      order_checkout: checkout_order,
+      order_products: shop_order_ids_new,
+      order_shipping: user_address,
+      order_payment: user_payment,
+    });
+
+    // success order -> remove products in cart
+    if (newOrder) {
+      // ---- TODO: must have loop for productId field input.
+      // const addedStock = await addStockToInventory({
+      //   stock: products.length,
+      //   productId: newOrder.order_products,
+      //   shopId,
+      //   location: user_address,
+      // });
+    }
+
+    return newOrder;
+  }
+
+  /* 
+    Query Orders [User]
+  */
+  static async getOrdersByUser({}) {}
+
+  /* 
+    Query Order Using Id [User]
+  */
+  static async getOrderByUser({}) {}
+
+  /* 
+    Cancel Order [User]
+  */
+  static async cancelOrderByUser({}) {}
+
+  /* 
+    Update Order Status [Shop | Admin]
+  */
+  static async updateOrderStatusByShop({}) {}
 }
 
 module.exports = CheckoutService;

@@ -2,8 +2,8 @@
 
 const { Schema, model } = require('mongoose'); // Erase if already required
 
-const DOCUMENT_NAME = 'Cart';
-const COLLECTION_NAME = 'carts';
+const DOCUMENT_NAME = 'Order';
+const COLLECTION_NAME = 'orders';
 
 /*
 [
@@ -17,27 +17,54 @@ const COLLECTION_NAME = 'carts';
 ]
  */
 // Declare the Schema of the Mongo model
-var cartSchema = new Schema(
+var orderSchema = new Schema(
   {
-    cart_state: {
-      type: String,
+    order_userId: {
+      type: Number,
       required: true,
-      enum: ['active', 'completed', 'failure', 'pending'],
-      default: 'active',
     },
-    cart_products: {
+    order_checkout: {
+      type: Object,
+      required: true,
+      default: {},
+    },
+    /*
+      order_checkout = {
+        totalPrice, 
+        totalApplyDiscount,
+        feeShip
+      }
+     */
+
+    order_shipping: {
+      type: Object,
+      required: true,
+      default: {},
+    },
+    /* 
+      street, 
+      city,
+      state,
+      country
+    */
+    order_payment: {
+      type: Object,
+      required: true,
+      default: {},
+    },
+    order_products: {
       type: Array,
       required: true,
       default: [],
     },
-    cart_quantity_products: {
-      type: Number,
-      required: true,
-      default: 0,
+    order_trackingNumber: {
+      type: String,
+      default: '#0001',
     },
-    cart_userId: {
-      type: Number,
-      required: true,
+    order_status: {
+      type: String,
+      enum: ['pending', 'confirmed', 'shipped', 'cancelled', 'delivered'],
+      default: 'pending',
     },
   },
   {
@@ -51,5 +78,5 @@ var cartSchema = new Schema(
 
 //Export the model
 module.exports = {
-  cart: model(DOCUMENT_NAME, cartSchema),
+  order: model(DOCUMENT_NAME, orderSchema),
 };
