@@ -1,6 +1,7 @@
 'use strict';
 
 const { cart } = require('../cart.model');
+const { convertToObjectId } = require('../../utils');
 const createUserCart = async ({ userId, product }) => {
   const query = {
     cart_userId: userId,
@@ -37,6 +38,10 @@ const findOneCartByUserId = async userId => {
   return await cart.findOne({ cart_userId: userId });
 };
 
+const findCartById = async cartId => {
+  return await cart.findById(cartId);
+};
+
 const deleteUserCart = async ({ userId, productId }) => {
   const query = { cart_userId: userId, cart_state: 'active' };
   const updateSet = {
@@ -61,6 +66,7 @@ module.exports = {
   createUserCart,
   updateUserCartQuantity,
   findOneCartByUserId,
+  findCartById,
   deleteUserCart,
   getListUserCart,
 };

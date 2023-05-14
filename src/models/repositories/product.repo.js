@@ -16,7 +16,7 @@ const searchProductByUser = async ({ keySearch }) => {
       {
         $text: { $search: regexSearch },
       },
-      { score: { $meta: 'textScore' } }
+      { score: { $meta: 'textScore' } },
     )
     .sort({ score: { $meta: 'textScore' } })
     .lean();
@@ -98,6 +98,21 @@ const queryProduct = async ({ query, limit, skip }) => {
     .exec();
 };
 
+const checkProductAvailable = async products => {
+  return await Promise.all(
+    products.map(async product => {
+      const foundProduct = await findProduct({ product_id: product.productId });
+      if (foundProduct) {
+        return {
+          price: foundProduct.product_price,
+          quantity: product.quantity,
+          productId: foundProduct._id,
+        };
+      }
+    }),
+  );
+};
+
 module.exports = {
   findAllDraftStatusForShop,
   publishProductByShop,
@@ -107,4 +122,5 @@ module.exports = {
   findAllProducts,
   findProduct,
   updateProductById,
+  checkProductAvailable,
 };
