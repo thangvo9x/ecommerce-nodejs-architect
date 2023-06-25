@@ -7,20 +7,19 @@ const {
 } = require('../models/repositories/inventory.repo');
 const redisClient = redis.createClient();
 
-// redisClient.ping((err, result) => {
-//   if (err) {
-//     console.error('Error connecting database:', err);
-//   } else {
-//     console.log('Connected to redis');
-//   }
-// });
+redisClient.ping((err, result) => {
+  if (err) {
+    console.error('Error connecting database:', err);
+  } else {
+    console.log('Connected to redis');
+  }
+});
 
-// redisClient.on('error', err => console.log('Redis Server Error', err));
-
-const pexpire = promisify(redisClient.pExpire).bind(redisClient);
-const setNXAsync = promisify(redisClient.setNX).bind(redisClient);
+redisClient.on('error', err => console.log('Redis Server Error', err));
 
 const aquireLock = async (productId, quantity, cartId) => {
+  const pexpire = promisify(redisClient.pExpire).bind(redisClient);
+  const setNXAsync = promisify(redisClient.setNX).bind(redisClient);
   const key = `lock_v2023_${productId}`;
   const retryTimes = 10; // how many time to retry.
   const expireTime = 3; // time to temp lock

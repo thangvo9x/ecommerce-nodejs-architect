@@ -1,8 +1,8 @@
 'use strict';
 
 const { Client, GatewayIntentBits } = require('discord.js');
-const { redis } = require('redis');
 const { CHANNEL_ID_DISCORD, TOKEN_DISCORD } = process.env;
+
 class LoggerService {
   constructor() {
     this.client = new Client({
@@ -15,6 +15,7 @@ class LoggerService {
     });
 
     this.channelId = CHANNEL_ID_DISCORD;
+
     this.client.on('ready', () =>
       console.log('Logged as', this.client.user.tag),
     );
@@ -32,5 +33,5 @@ class LoggerService {
   }
 }
 
-// module.exports = LoggerService;
-module.exports = new LoggerService();
+const loggerService = new LoggerService();
+module.exports = loggerService;
