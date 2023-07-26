@@ -29,7 +29,7 @@ class CommentService {
     if (parentCommentId) {
       // reply comment
       const parentComment = await Comment.findById(parentCommentId);
-      if (!parentComment) throw new NotFoundError('Comment Parent not found');
+      if (!parentComment) throw new NotFoundError('parent comment not found');
 
       rightValue = parentComment.comment_right;
       // updateMany comments
@@ -37,6 +37,15 @@ class CommentService {
         {
           comment_productId: convertToObjectId(productId),
           comment_right: { $gte: rightValue },
+        },
+        {
+          $inc: { comment_right: 2 },
+        },
+      );
+      await Comment.updateMany(
+        {
+          comment_productId: convertToObjectId(productId),
+          comment_left: { $gte: rightValue },
         },
         {
           $inc: { comment_left: 2 },
