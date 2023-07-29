@@ -11,5 +11,6 @@ router.use(authentication);
 
 router.post('', asyncHandler(CommentController.addComment));
 router.get('', asyncHandler(CommentController.getComments));
+router.delete('', asyncHandler(CommentController.deleteComment));
 
 module.exports = router;
