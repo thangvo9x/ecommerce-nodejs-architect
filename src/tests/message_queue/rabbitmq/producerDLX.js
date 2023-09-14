@@ -33,7 +33,7 @@ const runProducer = async () => {
 
     // 4. send message
     const msg = 'a new product';
-    console.info(`product msg ${msg}`);
+    console.log(`product msg ${msg}`);
     await channel.sendToQueue(queueResult.queue, Buffer.from(msg), {
       expiration: '10000', // in ms
     });
