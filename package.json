@@ -14,6 +14,7 @@
   "dependencies": {
     "amqplib": "^0.10.3",
     "bcrypt": "^5.1.0",
+    "cloudinary": "^1.41.0",
     "discord.js": "^14.11.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
