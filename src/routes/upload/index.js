@@ -22,4 +22,12 @@ router.post(
   asyncHandler(uploadController.uploadFiles),
 );
 
+// Use S3
+
+router.post(
+  '/product/bucket',
+  uploadMemory.single('file'),
+  asyncHandler(uploadController.uploadFileLocalS3),
+);
+
 module.exports = router;
